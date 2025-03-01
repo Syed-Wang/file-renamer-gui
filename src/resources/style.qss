@@ -1,0 +1,46 @@
+/* 设置主窗口的背景颜色 */
+QMainWindow {
+    background-color: #f0f0f0;
+}
+
+/* 设置按钮的样式 */
+QPushButton {
+    background-color: #4CAF50; /* 绿色 */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+QPushButton:hover {
+    background-color: #45a049; /* 深绿色 */
+}
+
+/* 设置输入框的样式 */
+QLineEdit {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* 设置标签的样式 */
+QLabel {
+    font-size: 16px;
+    color: #333;
+}
+
+/* 设置日志输出区域的样式 */
+QTextEdit {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #ffffff;
+}

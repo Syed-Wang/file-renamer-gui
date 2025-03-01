@@ -1,0 +1,12 @@
+file-renamer-gui
+├── src
+│   ├── main.py
+│   ├── gui
+│   │   └── main_window.py
+│   ├── core
+│   │   ├── rename_utils.py
+│   │   └── logger.py
+│   └── resources
+│       └── style.qss
+├── requirements.txt
+└── README.md
