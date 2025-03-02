@@ -2,6 +2,7 @@ import os
 import re
 import logging
 
+
 def natural_sort_key(s):
     """
     自然排序的键函数
@@ -12,17 +13,37 @@ def natural_sort_key(s):
         for text in re.split("([0-9]+)", s)
     ]
 
+
+def validate_inputs(path, start_num, prefix):
+    """验证输入参数"""
+    if not os.path.exists(path):
+        raise ValueError("文件夹路径不存在")
+
+    if not os.path.isdir(path):
+        raise ValueError("指定路径不是文件夹")
+
+    try:
+        start_num = int(start_num)
+        if start_num < 0:
+            raise ValueError("起始数字必须大于等于0")
+    except ValueError:
+        raise ValueError("起始数字必须是有效的整数")
+
+    if len(prefix) > 50:
+        raise ValueError("前缀长度不能超过50个字符")
+
+    return True
+
+
 def rename_files(path, start_num=1, prefix=""):
     """
     重命名指定文件夹下的所有文件
     :param path: 文件夹路径
     :param start_num: 起始数字，默认为1
-    :param prefix: 文件名前缀，默认为空
+    :param prefix: 文件名前缀，默认为空。如果为空，则在原文件名前添加数字前缀
     """
-    # 确保路径存在
-    if not os.path.exists(path):
-        logging.error(f"路径 {path} 不存在!")
-        return
+    # 验证输入参数
+    validate_inputs(path, start_num, prefix)
 
     # 获取所有文件
     files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
@@ -37,18 +58,35 @@ def rename_files(path, start_num=1, prefix=""):
 
     # 遍历并重命名文件
     for index, file in enumerate(files, start=start_num):
-        # 获取文件扩展名
-        _, ext = os.path.splitext(file)
-        # 构建新文件名
-        new_name = f"{index}-{prefix}{ext}"
-        # 构建完整的文件路径
-        old_file = os.path.join(path, file)
-        new_file = os.path.join(path, new_name)
-
         try:
-            os.rename(old_file, new_file)
-            logging.info(f"已重命名: {file} -> {new_name}")
-            successful_renames += 1
+            if prefix:
+                # 如果有前缀，使用 "数字-前缀.扩展名" 格式
+                _, ext = os.path.splitext(file)
+                new_name = f"{index}-{prefix}{ext}"
+            else:
+                # 如果没有前缀，使用 "数字-原文件名" 格式
+                new_name = f"{index}-{file}"
+                
+            old_file = os.path.join(path, file)
+            new_file = os.path.join(path, new_name)
+
+            if os.path.exists(new_file):
+                base, ext = os.path.splitext(new_name)
+                counter = 1
+                while os.path.exists(os.path.join(path, f"{base}_{counter}{ext}")):
+                    counter += 1
+                new_name = f"{base}_{counter}{ext}"
+                new_file = os.path.join(path, new_name)
+
+            try:
+                os.rename(old_file, new_file)
+            except OSError as e:
+                logging.error(f"重命名失败 {file}: {e.strerror}")
+            except PermissionError:
+                logging.error(f"没有权限重命名文件 {file}")
+            else:
+                logging.info(f"已重命名: {file} -> {new_name}")
+                successful_renames += 1
         except Exception as e:
             logging.error(f"重命名 {file} 时出错: {str(e)}")
             failed_renames += 1
